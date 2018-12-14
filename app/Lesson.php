@@ -178,4 +178,9 @@ class Lesson extends Model
     {
         return $this->hasMany(WaitList::class)->orderBy('created_at', 'asc');
     }
+
+    public function PoolSessions()
+    {
+        return $this->morphMany('App\PoolSession', 'model');
+    }
 }
