@@ -15,7 +15,7 @@ class EventsCalendar
 
         foreach($sessions as $session){
             $color = $this->getEventColor($session->model);
-            $event[] = \Calendar::event(
+            $event[] = Calendar::event(
                 $session->model->title(),
                 false,
                 $session->start_time,
@@ -31,7 +31,7 @@ class EventsCalendar
 
         //dd($event);
 
-        $event[] = \Calendar::event(
+        $event[] = Calendar::event(
             "Valentine's Day", //event title
             false, //full day event?
             '2018-12-14T0800', //start time, must be a DateTime object or valid DateTime format (http://bit.ly/1z7QWbg)
@@ -43,7 +43,7 @@ class EventsCalendar
         );
 
 
-        $calendar = \MaddHatter\LaravelFullcalendar\Facades\Calendar::addEvents($event) //add an array with addEvents
+        $calendar = Calendar::addEvents($event) //add an array with addEvents
         ->setOptions([ //set fullcalendar options
             'firstDay' => 1
         ]);
