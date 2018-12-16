@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Library\Interfaces\CalendarInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Nova\Actions\Actionable;
@@ -29,7 +30,7 @@ use phpDocumentor\Reflection\Types\Boolean;
  * @property-read \App\Season $season
  */
 
-class Lesson extends Model
+class Lesson extends Model implements CalendarInterface
 {
     use SoftDeletes, Actionable;
 
@@ -179,8 +180,19 @@ class Lesson extends Model
         return $this->hasMany(WaitList::class)->orderBy('created_at', 'asc');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
     public function PoolSessions()
     {
         return $this->morphMany('App\PoolSession', 'model');
+    }
+
+    /**
+     * @return string
+     */
+    public function title()
+    {
+        return $this->group->type;
     }
 }
