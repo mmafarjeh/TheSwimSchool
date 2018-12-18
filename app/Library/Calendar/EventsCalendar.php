@@ -4,18 +4,36 @@ namespace App\Library\Calendar;
 
 
 use App\PoolSession;
+use Illuminate\Support\Collection;
 use MaddHatter\LaravelFullcalendar\Calendar;
 
 
 class EventsCalendar
 {
-    public function testing()
+    public function createCalendarFromModels(array $models)
     {
-        $sessions = PoolSession::all();
+        $sessions = collect([]);
+        foreach ($models as $model){
+            $sessions->push($this->getSessionsFromModel($model));
+        }
+
+        $calendar = $this->buildCalendar($this->buildEvents($sessions->flatten(1)));
+
+        return $calendar;
+    }
+
+    public function getSessionsFromModel(string $model) : Collection
+    {
+        return PoolSession::where('model_type', '=', $model)->get();
+    }
+
+    public function buildEvents(Collection $sessions)
+    {
+        $events = [];
 
         foreach($sessions as $session){
             $color = $this->getEventColor($session->model);
-            $event[] = Calendar::event(
+            $events[] = Calendar::event(
                 $session->model->title(),
                 false,
                 $session->start_time,
@@ -28,27 +46,19 @@ class EventsCalendar
                 ]
             );
         }
+        return $events;
+    }
 
-        //dd($event);
-
-        $event[] = Calendar::event(
-            "Valentine's Day", //event title
-            false, //full day event?
-            '2018-12-14T0800', //start time, must be a DateTime object or valid DateTime format (http://bit.ly/1z7QWbg)
-            '2015-12-14T0900', //end time, must be a DateTime object or valid DateTime format (http://bit.ly/1z7QWbg),
-            1, //optional event ID
-            [
-                'url' => '/lesson/213'
-            ]
-        );
-
-
-        $calendar = Calendar::addEvents($event) //add an array with addEvents
+    /**
+     * @param array $events
+     * @return Calendar
+     */
+    public function buildCalendar(array $events)
+    {
+        return \Calendar::addEvents($events) //add an array with addEvents
         ->setOptions([ //set fullcalendar options
             'firstDay' => 1
         ]);
-
-        return view('test', compact('calendar'));
     }
 
     public static function getEventColor($model) : string
